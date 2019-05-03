@@ -1,6 +1,7 @@
 var express=require('express');
 var router=express.Router();
 var db=require('../db')
+var verifyToken=require('./verifyToken')
 
 router.route("/")
     .get((req,res)=>{
@@ -9,7 +10,8 @@ router.route("/")
             res.status(200).send(requests)
         })
     })
-    .post((req,res)=>{
+    .post(verifyToken,(req,res)=>{
+        req.body.userId=req.userId;
         var newRequest=new db.RoommateRequest(req.body);
         newRequest.save((err,request)=>{
             if(err) res.status(500).send(err);

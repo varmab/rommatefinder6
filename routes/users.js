@@ -14,25 +14,22 @@ var verifyToken=require("../routes/verifyToken")
 //Register User
 router.route("/register")
     .post((req,res)=>{
-
+        console.log("register api call")
         //encrypt password before save
         var hashedPassword=bcrypt.hashSync(req.body.password, 8);
         req.body.password=hashedPassword;
 
         var newUser=new db.User(req.body);
-        newUser.save()
-        .then((user)=>{
-
+        newUser.save((err,user)=>{
+            console.log(JSON.stringify(err))
+            if(err) res.status(500).send(err)
             //create jwt token
             var token = jwt.sign({ id: user._id },
-                                    process.env.JWT_SECRET, {
-                                    expiresIn: 86400 // expires in 24 hours
-                                });
+                process.env.JWT_SECRET, {
+                expiresIn: 86400 // expires in 24 hours
+            });
             console.log(token);
             res.status(200).send({auth:true,token: token});
-        })
-        .catch((err)=>{
-            res.status(500).send(err);
         })
     })
 
